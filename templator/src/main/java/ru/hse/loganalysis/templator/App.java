@@ -21,7 +21,7 @@ public class App extends Application {
     public void start(Stage stage) {
     	BorderPane root = new BorderPane();
     	createContent(root);
-        Scene scene = new Scene(root, 640, 480);
+    	Scene scene = new Scene(root, 640, 480);
         stage.setScene(scene);
         stage.setTitle("Templator with JavaFX");
         stage.show();

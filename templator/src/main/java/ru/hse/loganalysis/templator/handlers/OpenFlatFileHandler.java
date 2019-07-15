@@ -13,8 +13,7 @@ public class OpenFlatFileHandler implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent event) {
 		MenuItem source = (MenuItem) event.getSource();
-		source.get	
-		Window window = source.getScene().getWindow();
+		Window window = source.getParentPopup().getOwnerWindow();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open flat logs file");
 		fileChooser.getExtensionFilters().addAll(
