@@ -11,6 +11,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+/**
+ * First screen of the Templator application, displaying the {@link List} of {@link String Strings} provided in constructor.<br />
+ * Tries to be immutable, but internal JavaFX objects may be accessed with FX-objects tree traversing.<br />
+ * Pressing on "Next" button creates new instance of Pane. 
+ * 
+ * @author Alexander Ovchinnikov
+ *
+ */
 public class SourceDataPaneWithMessages implements Pane {
 	private final int width;
 	private final int height;
@@ -18,6 +26,8 @@ public class SourceDataPaneWithMessages implements Pane {
 	private final List<String> messages;
 
 	/**
+	 * Constructor
+	 * 
 	 * @param width
 	 * @param height
 	 * @param messages
@@ -34,6 +44,10 @@ public class SourceDataPaneWithMessages implements Pane {
 		BorderPane root = new BorderPane();
 		ListView<String> view = new ListView<String>(FXCollections.observableList(this.messages));
 		Button next = new Button("Next");
+		next.setOnAction(event -> {
+			Pane pane = new EmptySimilarMessagesPane(this.width, this.height, this.messages);
+			pane.showOn(stage);
+		});
 		AnchorPane.setTopAnchor(next, 10.0);
 		AnchorPane.setRightAnchor(next, 10.0);
 		AnchorPane.setBottomAnchor(next, 10.0);

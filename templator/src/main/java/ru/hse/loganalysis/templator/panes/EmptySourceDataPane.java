@@ -18,11 +18,21 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import ru.hse.loganalysis.templator.controls.ExceptionAlert;
 
+/**
+ * First screen of the Templator application.<br />
+ * Tries to be immutable, but internal JavaFX objects may be accessed with FX-objects tree traversing.<br />
+ * Pressing on "Next" button creates new instance of Pane. 
+ * 
+ * @author Alexander Ovchinnikov
+ *
+ */
 public class EmptySourceDataPane implements Pane {
 	private final int width;
 	private final int height;
 
 	/**
+	 * Constructor 
+	 * 
 	 * @param width
 	 * @param height
 	 */
@@ -31,6 +41,12 @@ public class EmptySourceDataPane implements Pane {
 		this.height = height;
 	}
 
+	/**
+	 * Creates and configures MenuBar of the screen
+	 * 
+	 * @param root
+	 * @param stage
+	 */
 	private void createMenuBarOnTop(BorderPane root, Stage stage) {
 		MenuBar bar = new MenuBar();
 		MenuItem plain = new MenuItem("Open _plain log file");
