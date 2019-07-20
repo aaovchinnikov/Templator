@@ -23,7 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 
-public class OpenFlatFileHandler implements EventHandler<ActionEvent> {
+public class OpenPlainLogFileHandler implements EventHandler<ActionEvent> {
 	
 	private String stackTrace(Exception e) {
 		StringWriter sw = new StringWriter();
