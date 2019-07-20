@@ -32,6 +32,7 @@ public class EmptySourceDataPane implements Pane {
 	}
 
 	private void createMenuBarOnTop(BorderPane root, Stage stage) {
+		MenuBar bar = new MenuBar();
 		MenuItem plain = new MenuItem("Open _plain log file");
 		plain.setOnAction(event -> {
 			FileChooser fileChooser = new FileChooser();
@@ -42,7 +43,7 @@ public class EmptySourceDataPane implements Pane {
 			if (selectedFile != null) {
 				try {
 					List<String> messages = Files.readAllLines(selectedFile.toPath());
-					Pane pane = new SourceDataPaneWithMessages(this.width, this.height, messages);
+					Pane pane = new SourceDataPaneWithMessages(this.width, this.height, bar, messages);
 					pane.showOn(stage);
 				} catch (IOException e) {
 					ExceptionAlert alert = new ExceptionAlert(e);
@@ -59,7 +60,7 @@ public class EmptySourceDataPane implements Pane {
 		menu.getItems().add(plain);
 		menu.getItems().add(separator);
 		menu.getItems().add(exit);
-		MenuBar bar = new MenuBar(menu);
+		bar.getMenus().add(menu);
 		root.setTop(bar);
 	}
 

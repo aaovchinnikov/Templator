@@ -12,7 +12,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
     	new EmptySourceDataPane(640,480).showOn(stage);
-        stage.setTitle("Templator with JavaFX");        
+    	stage.setTitle("Templator with JavaFX");        
         stage.show();
     }
 
