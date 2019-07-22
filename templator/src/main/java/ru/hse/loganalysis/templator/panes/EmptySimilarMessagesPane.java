@@ -5,7 +5,7 @@ import java.util.List;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,9 +19,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
 public class EmptySimilarMessagesPane implements Pane {
+	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
 	private final int width;
 	private final int height;
 	private final List<String> messages;
@@ -37,7 +39,7 @@ public class EmptySimilarMessagesPane implements Pane {
 		this.messages = messages;
 	}
 
-	private void addMenuBarToTopOfPane(BorderPane root) {
+	private void addMenuBarToTopOfPane(GridPane root) {
 		MenuItem exit = new MenuItem("_Exit");
 		exit.setOnAction(event -> {
 			Platform.exit();
@@ -50,10 +52,10 @@ public class EmptySimilarMessagesPane implements Pane {
 		placeholders.getItems().add(load);
 		placeholders.getItems().add(save);
 		MenuBar bar = new MenuBar(file, placeholders);
-		root.setTop(bar);
+		root.add(bar, 0, 0, 2, 1);
 	}
 
-	private void addTemplatesToCenterOfPane(BorderPane root) {
+	private void addTemplatesToCenterOfPane(GridPane root) {
 		Label label = new Label(
 				"Press \"Next group of similar messages\" to generate next template based on loaded messages");
 		Label generatedLabel = new Label("Generated template:");
@@ -87,33 +89,53 @@ public class EmptySimilarMessagesPane implements Pane {
 		TitledPane templates = new TitledPane();
 		templates.setText("Groups and templates");
 		templates.setCollapsible(false);
-		templates.setPrefHeight(Double.MAX_VALUE);
 		templates.setContent(grid);
-		BorderPane.setMargin(templates, new Insets(5));
-		root.setCenter(templates);
+//		root.add(templates, 0, 1);
+		GridPane.setMargin(templates, new Insets(5));
 	}
 
-	private void addPlaceholdersViewToRightOfPane(BorderPane root) {
+	/**
+	 * @param root
+	 * @implNote GridPane uses maxSize property instead of prefferedSize, 
+	 * using preferredSize makes no effect or weird behavior 
+	 */
+	private void addPlaceholdersViewToRightOfPane(GridPane root) {
+		Label label = new Label("Use \"Load placeholders\" in \"Placeholders\" menu to load previously saved placeholders");
+		label.setWrapText(true);
 		TitledPane placeholders = new TitledPane();
 		placeholders.setText("Placeholders");
 		placeholders.setCollapsible(false);
-		BorderPane.setMargin(placeholders, new Insets(5));
-		root.setRight(placeholders);
+		placeholders.setContent(label);
+		placeholders.setMaxHeight(Double.MAX_VALUE);
+		root.add(placeholders, 0, 1);
+		GridPane.setMargin(placeholders, new Insets(5));
+//		GridPane.setHalignment(label, HPos.CENTER);
 	}
 
-	private void addNextButtonToBottomOfPane(BorderPane root) {
+	private void addNextButtonToBottomOfPane(GridPane root) {
 		Button next = new Button("Next");
 		next.setDisable(true);
 		AnchorPane.setTopAnchor(next, 10.0);
 		AnchorPane.setRightAnchor(next, 10.0);
 		AnchorPane.setBottomAnchor(next, 10.0);
 		AnchorPane anchor = new AnchorPane(next);
-		root.setBottom(anchor);
+		root.add(anchor, 1, 2);
 	}
 
 	@Override
 	public void showOn(Stage stage) {
-		BorderPane root = new BorderPane();
+		GridPane root = new GridPane();
+		ColumnConstraints col0 = new ColumnConstraints();
+		col0.setHgrow(Priority.ALWAYS);
+		ColumnConstraints col1 = new ColumnConstraints();
+		col1.setPercentWidth(RIGHT_PERCENTAGE_WIDTH);
+		root.getColumnConstraints().add(col0);
+		root.getColumnConstraints().add(col1);
+		RowConstraints row0 = new RowConstraints();
+		RowConstraints row1 = new RowConstraints();
+		row1.setVgrow(Priority.ALWAYS);
+		root.getRowConstraints().add(row0);
+		root.getRowConstraints().add(row1);
 		addMenuBarToTopOfPane(root);
 		addTemplatesToCenterOfPane(root);
 		addNextButtonToBottomOfPane(root);
