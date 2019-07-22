@@ -84,10 +84,15 @@ public class EmptySimilarMessagesPane implements Pane {
 			if (iterator.hasNext()) {
 				String currentMessage = iterator.next();
 				// РџРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РїРѕС…РѕР¶РёС… СЃС‚СЂРѕРє
-				for (String s : messages) {
+				for (String s : this.messages) {
 					if (Metrics.checkCompositeMetric(currentMessage, s, 150, METRIC_THRESHOLD, 150)) {
 						similarStrings.add(s);
 					}
+					// NEW Variant
+					if (this.check.isTrue()) {
+						similarStrings.add(s);
+					}
+					
 				}
 				
 					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ

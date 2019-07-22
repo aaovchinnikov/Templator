@@ -1,5 +1,7 @@
 package ru.hse.loganalysis.templator.metrics;
 
+import ru.hse.loganalysis.templator.lcs.StringComparison;
+
 public class Metrics {
 
 	public static final int LevenshteinDistance = 1 << 0;
