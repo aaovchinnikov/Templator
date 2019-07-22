@@ -1,5 +1,8 @@
 package ru.hse.loganalysis.templator.panes;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -23,6 +26,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import util.Metrics;
+import util.StringComparison;
+import util.Templates;
 
 public class EmptySimilarMessagesPane implements Pane {
 	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
@@ -63,7 +69,7 @@ public class EmptySimilarMessagesPane implements Pane {
 	 * @implNote GridPane uses maxSize property instead of prefferedSize, 
 	 * using preferredSize makes no effect or weird behavior 
 	 */
-	private void addTemplatesToCenterOfPane(GridPane root) {
+	private void addTemplatesToCenterOfPane(GridPane root, Stage stage) {
 		Label label = new Label(
 				"Press \"Next group of similar messages\" below to generate next template based on loaded messages");
 		label.setWrapText(true);
@@ -72,6 +78,42 @@ public class EmptySimilarMessagesPane implements Pane {
 		label.setPadding(new Insets(5));
 		Label generatedLabel = new Label("Generated template:");
 		Button similar = new Button("Next group of similar messages");
+		similar.setOnAction(event -> {
+			List<String> similarStrings = new LinkedList<String>();
+			Iterator<String> iterator = this.messages.iterator();				
+			if (iterator.hasNext()) {
+				String currentMessage = iterator.next();
+				// РџРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РїРѕС…РѕР¶РёС… СЃС‚СЂРѕРє
+				for (String s : messages) {
+					if (Metrics.checkCompositeMetric(currentMessage, s, 150, METRIC_THRESHOLD, 150)) {
+						similarStrings.add(s);
+					}
+				}
+				
+					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ
+					System.out.println(similarStrings);
+
+					if(similarStrings.size()==1){
+						return similarStrings;
+					}
+					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ
+					System.out.println("РЅР°С‡Р°Р» РІС‹С‡РёСЃР»РµРЅРёРµ unitedtemplate");
+					String lcSequence = StringComparison.computeLCSubsequenceForStringGroup(similarStrings);
+					String unitedTemplate = Templates.getUnitedTemplate(similarStrings, lcSequence);
+					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ
+					System.out.println("Р·Р°РєРѕРЅС‡РёР» РІС‹С‡РёСЃР»РµРЅРёРµ unitedtemplate");
+					offeredTemplateText.setText(unitedTemplate);
+				} else {
+					changeGroupButton.setEnabled(false);
+				}
+
+				return similarStrings;
+			}
+
+			
+			Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages);
+			pane.showOn(stage);
+		});
 		TextField generatedText = new TextField();
 		generatedText.setDisable(true);
 		Label userLabel = new Label("User template:");
@@ -151,7 +193,7 @@ public class EmptySimilarMessagesPane implements Pane {
 		root.getRowConstraints().add(row0);
 		root.getRowConstraints().add(row1);
 		addMenuBarToTopOfPane(root);
-		addTemplatesToCenterOfPane(root);
+		addTemplatesToCenterOfPane(root, stage);
 		addNextButtonToBottomOfPane(root);
 		addPlaceholdersViewToRightOfPane(root);
 		stage.setScene(new Scene(root, this.width, this.height));
