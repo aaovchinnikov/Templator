@@ -25,12 +25,19 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.hse.loganalysis.templator.lcs.StringComparison;
+import ru.hse.loganalysis.templator.metrics.LevenshteinDistance;
 import ru.hse.loganalysis.templator.metrics.Metrics;
+import ru.hse.loganalysis.templator.metrics.MinOfTwoStringsLength;
+import ru.hse.loganalysis.templator.metrics.OverlapCoefficient;
+import ru.hse.loganalysis.templator.metrics.checks.LessCheck;
 import ru.hse.loganalysis.templator.metrics.checks.MetricCheck;
+import ru.hse.loganalysis.templator.metrics.checks.MoreCheck;
+import ru.hse.loganalysis.templator.metrics.checks.TwoChecksComposite;
 import ru.hse.loganalysis.templator.metrics.checks.TwoMetricComposite;
 
 public class EmptySimilarMessagesPane implements Pane {
 	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
+	private static final int LENGTH_THRESHOLD = 150;
 	private final int width;
 	private final int height;
 	private final List<String> messages;
@@ -78,43 +85,41 @@ public class EmptySimilarMessagesPane implements Pane {
 		Label generatedLabel = new Label("Generated template:");
 		Button similar = new Button("Next group of similar messages");
 		similar.setOnAction(event -> {
+			System.out.println("changeGroupButton pressed");
+			userTemplateText.setText("");
+			//TODO Быстро переписать это говно!! Из-за него и тормозит!
+			List<String> similarMessages = getNextSimilarGroup();
+			while (similarMessages.size() == 1) {
+				System.out.println("similarMessages.size==1");
+				similarMessages = getNextSimilarGroup();
+			}
+			if (!similarMessages.isEmpty()) {
+				setInput(similarMessages);
+			} else {
+				listViewer.setInput(new String[] { "No more similar groups. Seems you are stuck here. =)" });
+			}
+
+			
+			// TODO this was method getNextSimilarGroup()
 			List<String> similarStrings = new LinkedList<String>();
-			Iterator<String> iterator = this.messages.iterator();				
-			if (iterator.hasNext()) {
-				String currentMessage = iterator.next();
-				// РџРѕСЃС‚СЂРѕРµРЅРёРµ СЃРїРёСЃРєР° РїРѕС…РѕР¶РёС… СЃС‚СЂРѕРє
+			for(String currentMessage: this.messages) {
 				for (String s : this.messages) {
-					if (Metrics.checkCompositeMetric(currentMessage, s, 150, METRIC_THRESHOLD, 150)) {
-						similarStrings.add(s);
-					}
-					// NEW Variant
-					MetricCheck check = new TwoMetricComposite();
+					MetricCheck check = new TwoChecksComposite(
+							new LessCheck(new LevenshteinDistance(currentMessage, s), 20),
+							new MoreCheck(new OverlapCoefficient(currentMessage, s), 90),
+							new LessCheck(new MinOfTwoStringsLength(currentMessage, s), 150));
 					if (check.isTrue()) {
 						similarStrings.add(s);
 					}
-					
 				}
-				
-					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ
-					System.out.println(similarStrings);
-
-					if(similarStrings.size()==1){
-						return similarStrings;
-					}
-					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ
-					System.out.println("РЅР°С‡Р°Р» РІС‹С‡РёСЃР»РµРЅРёРµ unitedtemplate");
-					String lcSequence = StringComparison.computeLCSubsequenceForStringGroup(similarStrings);
-					String unitedTemplate = Templates.getUnitedTemplate(similarStrings, lcSequence);
-					//TODO РґР»СЏ РѕС‚Р»Р°РґРєРё РґРёРєРёС… С‚РѕСЂРјРѕР·РѕРІ
-					System.out.println("Р·Р°РєРѕРЅС‡РёР» РІС‹С‡РёСЃР»РµРЅРёРµ unitedtemplate");
-					offeredTemplateText.setText(unitedTemplate);
-				} else {
-					changeGroupButton.setEnabled(false);
+				if(similarStrings.size()==1){
+					break;
 				}
-
-				return similarStrings;
+				String lcSequence = StringComparison.computeLCSubsequenceForStringGroup(similarStrings);
+				String unitedTemplate = Templates.getUnitedTemplate(similarStrings, lcSequence);
+				offeredTemplateText.setText(unitedTemplate);
 			}
-
+			////////////////////////
 			
 			Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages);
 			pane.showOn(stage);

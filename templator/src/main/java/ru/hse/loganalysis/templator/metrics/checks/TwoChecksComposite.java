@@ -1,34 +1,34 @@
 package ru.hse.loganalysis.templator.metrics.checks;
 
-import ru.hse.loganalysis.templator.metrics.Metric;
-import ru.hse.loganalysis.templator.metrics.Metrics;
-
 /**
- * Decorates two metrics to co
- * Проверяет строки по композитной метрике похожести. Композитная метрика рассчитывается как:<br/>
- * <code>
- * Math.min(s1.length(), s2.length()) < lengthThreshold ? checkMetric(s1, s2, Metrics.LevenshteinDistance, 20) : checkMetric(s1, s2, Metrics.OverlapCoefficient, 80)
+ * Decorates three MetricChecks. Computes result of first metric check if
+ * provided condition is true, else computes the second.
  * 
- * </code>
- * 
- * @param s1
- * @param s2
- * @param lengthThreshold
- * @param levensteinThreshold
- * @param overlapThreshold
- * @return
+ * @author sansey
  */
 public class TwoChecksComposite implements MetricCheck {
-	private final int lengthThreshold;
 	private final MetricCheck check1;
 	private final MetricCheck check2;
-	
+	private final MetricCheck condition;
+
+	/**
+	 * @param check1
+	 * @param check2
+	 * @param condition
+	 */
+	public TwoChecksComposite(MetricCheck check1, MetricCheck check2,
+			MetricCheck condition) {
+		this.check1 = check1;
+		this.check2 = check2;
+		this.condition = condition;
+	}
+
 	@Override
 	public boolean isTrue() {
-		if(Math.min(s1.length(), s2.length()) < lengthThreshold){
-			return checkMetric(s1, s2, Metrics.LevenshteinDistance, 20);
+		if (this.condition.isTrue()) {
+			return this.check1.isTrue();
 		} else {
-			return checkMetric(s1, s2, Metrics.OverlapCoefficient, 90);
+			return this.check2.isTrue();
 		}
 	}
 
@@ -36,5 +36,4 @@ public class TwoChecksComposite implements MetricCheck {
 	public boolean isFalse() {
 		return !isTrue();
 	}
-
 }
