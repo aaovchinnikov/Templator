@@ -1,12 +1,10 @@
 package ru.hse.loganalysis.templator.panes;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,9 +24,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import util.Metrics;
-import util.StringComparison;
-import util.Templates;
+import ru.hse.loganalysis.templator.lcs.StringComparison;
+import ru.hse.loganalysis.templator.metrics.Metrics;
+import ru.hse.loganalysis.templator.metrics.checks.MetricCheck;
+import ru.hse.loganalysis.templator.metrics.checks.TwoMetricComposite;
 
 public class EmptySimilarMessagesPane implements Pane {
 	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
@@ -89,7 +88,8 @@ public class EmptySimilarMessagesPane implements Pane {
 						similarStrings.add(s);
 					}
 					// NEW Variant
-					if (this.check.isTrue()) {
+					MetricCheck check = new TwoMetricComposite();
+					if (check.isTrue()) {
 						similarStrings.add(s);
 					}
 					

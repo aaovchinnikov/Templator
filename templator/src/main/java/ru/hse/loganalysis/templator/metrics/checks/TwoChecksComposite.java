@@ -1,4 +1,7 @@
-package ru.hse.loganalysis.templator.metrics;
+package ru.hse.loganalysis.templator.metrics.checks;
+
+import ru.hse.loganalysis.templator.metrics.Metric;
+import ru.hse.loganalysis.templator.metrics.Metrics;
 
 /**
  * Decorates two metrics to co
@@ -15,16 +18,23 @@ package ru.hse.loganalysis.templator.metrics;
  * @param overlapThreshold
  * @return
  */
-public class TwoMetricComposite implements Metric {
+public class TwoChecksComposite implements MetricCheck {
 	private final int lengthThreshold;
-	private final Metric metric1;
-	private final Metric metric2;
-	
+	private final MetricCheck check1;
+	private final MetricCheck check2;
 	
 	@Override
-	public int compute() {
-		// TODO Auto-generated method stub
-		return 0;
+	public boolean isTrue() {
+		if(Math.min(s1.length(), s2.length()) < lengthThreshold){
+			return checkMetric(s1, s2, Metrics.LevenshteinDistance, 20);
+		} else {
+			return checkMetric(s1, s2, Metrics.OverlapCoefficient, 90);
+		}
+	}
+
+	@Override
+	public boolean isFalse() {
+		return !isTrue();
 	}
 
 }
