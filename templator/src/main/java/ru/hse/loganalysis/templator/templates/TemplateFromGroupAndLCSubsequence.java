@@ -90,7 +90,7 @@ public class TemplateFromGroupAndLCSubsequence implements Template {
 	 */
 	@Override
 	public String template() {
-		StringBuilder template = getInitialTemplateCandidate());
+		StringBuilder template = getInitialTemplateCandidate();
 		replaceUnnamedPlaceholdersWithNumbered(template);
 		return template.toString();
 	}

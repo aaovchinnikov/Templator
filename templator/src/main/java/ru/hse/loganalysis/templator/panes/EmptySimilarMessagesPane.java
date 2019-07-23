@@ -119,7 +119,7 @@ public class EmptySimilarMessagesPane implements Pane {
 					break;
 				}
 				String lcSequence = new SubsequenceForGroup(similarStrings).subsequence();
-				String unitedTemplate = new TemplateFromGroupAndLCSubsequence(); 
+				String unitedTemplate = new TemplateFromGroupAndLCSubsequence(similarStrings, lcSequence).template(); 
 						Templates.getUnitedTemplate(similarStrings, lcSequence);
 				offeredTemplateText.setText(unitedTemplate);
 			}
