@@ -1,6 +1,6 @@
 package ru.hse.loganalysis.templator.metrics;
 
-import ru.hse.loganalysis.templator.lcs.StringComparison;
+import ru.hse.loganalysis.templator.lcs.DefaultSubsequence;
 
 /**
  * Decorates to strings to copmute their overlap coefficient metric.
@@ -20,8 +20,6 @@ public class OverlapCoefficient implements Metric {
 		this.s2 = s2;
 	}
 
-
-
 	/**
 	 * @implNote Computations are based on computing the longest 
 	 * common subsequence of strings provided in constructor.<br />
@@ -29,9 +27,8 @@ public class OverlapCoefficient implements Metric {
 	 */
 	@Override
 	public int compute() {
-		String lcs = StringComparison.computeLCSubsequence(this.s1, this.s2);
+		String lcs = new DefaultSubsequence(this.s1, this.s2).subsequence();
 		int base = Math.min(s1.length(), s2.length());
 		return base == 0 ? 0 : (int) lcs.length() * 100 / base;
 	}
-
 }

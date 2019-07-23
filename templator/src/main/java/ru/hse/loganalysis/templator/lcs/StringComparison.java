@@ -107,27 +107,6 @@ public class StringComparison {
 		return returnList;
 	}
 
-	/**
-	 * Возвращает наибольшую общую подпоследовательность символов для группы
-	 * строк. ВАЖНО! Таких подпоследовательностей может быть более, чем одна,
-	 * метод возвращет одну из них, при этом не определено какую именно.
-	 * 
-	 * @param similarStrings
-	 * @return
-	 */
-	public static String computeLCSubsequenceForStringGroup(List<String> similarStrings) {
-		if (similarStrings == null || similarStrings.isEmpty()) {
-			throw new IllegalArgumentException("similarStrings shouldn't be null or empty");
-		}
-
-		String lcs = similarStrings.get(0);
-		for (String s : similarStrings) {
-			lcs = StringComparison.computeLCSubsequence(s, lcs);
-		}
-
-		return lcs;
-	}
-
 	public static String computeLongestCommonSubstringForStringGroupAndLCS(List<String> similarStrings,
 			String lcSubsequence) {
 		String lcs = lcSubsequence;
@@ -248,43 +227,6 @@ public class StringComparison {
 	}
 
 	
-	public static String computeLCSubsequence(String s1, String s2) {
-		// number of lines of each file
-		int M = s1.length();
-		int N = s2.length();
-
-		// opt[i][j] = length of LCS of x[i..M] and y[j..N]
-		int[][] opt = new int[M + 1][N + 1];
-
-		// compute length of LCS and all subproblems via dynamic programming
-		for (int i = M - 1; i >= 0; i--) {
-			for (int j = N - 1; j >= 0; j--) {
-				if (s1.charAt(i) == s2.charAt(j)) {
-					opt[i][j] = opt[i + 1][j + 1] + 1;
-				} else {
-					opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
-				}
-			}
-		}
-
-		// recover LCS itself
-		int i = 0, j = 0;
-		StringBuilder sb = new StringBuilder();
-		while (i < M && j < N) {
-			if (s1.charAt(i) == s2.charAt(j)) {
-				sb.append(s1.charAt(i));
-				i++;
-				j++;
-			} else if (opt[i + 1][j] >= opt[i][j + 1]) {
-				i++;
-			} else {
-				j++;
-			}
-		}
-
-		return sb.toString();
-	}
-
 	/**
 	 * Функция возвращает строку, полученную в результате удаления из строки s1
 	 * общей подпоследовательности символов строк s1 и s2, то есть

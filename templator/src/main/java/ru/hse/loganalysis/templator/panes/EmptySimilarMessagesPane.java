@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javafx.application.Platform;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.hse.loganalysis.templator.lcs.StringComparison;
+import ru.hse.loganalysis.templator.lcs.SubsequenceForGroup;
 import ru.hse.loganalysis.templator.metrics.LevenshteinDistance;
 import ru.hse.loganalysis.templator.metrics.Metrics;
 import ru.hse.loganalysis.templator.metrics.MinOfTwoStringsLength;
@@ -34,6 +36,7 @@ import ru.hse.loganalysis.templator.metrics.checks.MetricCheck;
 import ru.hse.loganalysis.templator.metrics.checks.MoreCheck;
 import ru.hse.loganalysis.templator.metrics.checks.TwoChecksComposite;
 import ru.hse.loganalysis.templator.metrics.checks.TwoMetricComposite;
+import ru.hse.loganalysis.templator.templates.TemplateFromGroupAndLCSubsequence;
 
 public class EmptySimilarMessagesPane implements Pane {
 	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
@@ -115,8 +118,9 @@ public class EmptySimilarMessagesPane implements Pane {
 				if(similarStrings.size()==1){
 					break;
 				}
-				String lcSequence = StringComparison.computeLCSubsequenceForStringGroup(similarStrings);
-				String unitedTemplate = Templates.getUnitedTemplate(similarStrings, lcSequence);
+				String lcSequence = new SubsequenceForGroup(similarStrings).subsequence();
+				String unitedTemplate = new TemplateFromGroupAndLCSubsequence(); 
+						Templates.getUnitedTemplate(similarStrings, lcSequence);
 				offeredTemplateText.setText(unitedTemplate);
 			}
 			////////////////////////
