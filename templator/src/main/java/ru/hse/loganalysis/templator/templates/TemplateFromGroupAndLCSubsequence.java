@@ -45,13 +45,54 @@ public class TemplateFromGroupAndLCSubsequence implements Template {
 	 * @param sbList - list of StringBuilders of the strings in the {@link #list}
 	 * @return true, if any string of the {@link #list} contains at least one symbol, or false instead
 	 */
-	private static boolean hasAnyStringMoreSymbols(List<StringBuilder> sbList) {
+	private boolean hasAnyStringMoreSymbols(List<StringBuilder> sbList) {
 		for(StringBuilder sb: sbList){
 			if(sb.length() != 0){
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Checks if passed symbol is first in all passed StringBuilders 
+	 * @param ch - symbol to search
+	 * @param sbList - list of {@link StringBuilder StringBuilders} to search the symbol in
+	 * @return
+	 */
+	private boolean isSymbolFirst(char ch, List<StringBuilder> sbList) {
+		for(StringBuilder sb: sbList){
+			if(sb.charAt(0) != ch){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Deletes/truncates the first symbol form all passed StringBuiders
+	 * @param sbList
+	 */
+	private void deleteFirstSymbol(List<StringBuilder> sbList) {
+		for(StringBuilder sb: sbList){
+			sb.delete(0, 1);
+		}
+	}
+	
+	/**
+	 * Deletes/truncates all symbols from the beginning of StringBuilder to passed symbol <strong>ch</strong> for all passed StringBuilders
+	 * @param ch
+	 * @param sbList
+	 */
+	private static void deleteFirstDifferentSymbols(char ch, List<StringBuilder> sbList) {
+		int i;
+		for(StringBuilder sb: sbList){
+			i=0;
+			while (ch != sb.charAt(i) && i < sb.length()) {
+				i++;
+			}
+			sb.delete(0, i);
+		}
 	}
 	
 	/**
@@ -82,6 +123,18 @@ public class TemplateFromGroupAndLCSubsequence implements Template {
 			sb.append("{&}");
 		}
 		return sb;
+	}
+	
+	private void replaceUnnamedPlaceholdersWithNumbered(StringBuilder template) {
+		int index=0;
+		int indexesCount=0;
+		
+		index=template.indexOf("{&}");
+		while(index!=-1){
+			template.replace(index+1, index+2, String.valueOf(indexesCount));
+			indexesCount++;
+			index=template.indexOf("{&}", index);	
+		}
 	}
 	
 	/**

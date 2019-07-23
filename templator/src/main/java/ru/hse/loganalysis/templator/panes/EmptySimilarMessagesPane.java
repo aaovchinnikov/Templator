@@ -25,17 +25,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import ru.hse.loganalysis.templator.lcs.StringComparison;
 import ru.hse.loganalysis.templator.lcs.SubsequenceForGroup;
 import ru.hse.loganalysis.templator.metrics.LevenshteinDistance;
-import ru.hse.loganalysis.templator.metrics.Metrics;
 import ru.hse.loganalysis.templator.metrics.MinOfTwoStringsLength;
 import ru.hse.loganalysis.templator.metrics.OverlapCoefficient;
 import ru.hse.loganalysis.templator.metrics.checks.LessCheck;
 import ru.hse.loganalysis.templator.metrics.checks.MetricCheck;
 import ru.hse.loganalysis.templator.metrics.checks.MoreCheck;
 import ru.hse.loganalysis.templator.metrics.checks.TwoChecksComposite;
-import ru.hse.loganalysis.templator.metrics.checks.TwoMetricComposite;
 import ru.hse.loganalysis.templator.templates.TemplateFromGroupAndLCSubsequence;
 
 public class EmptySimilarMessagesPane implements Pane {
@@ -74,6 +71,30 @@ public class EmptySimilarMessagesPane implements Pane {
 	}
 
 	/**
+	 * Performs one step on outer iterator and full cycle on inner iterator to search for similar strings.  
+	 * @param outer - outer iterator of list with messages
+	 * @param inner - inner iterator of list with messages
+	 * @return list of messages similar to one from outer.next() call.
+	 */
+	private List<String> getNextSimilarGroup(Iterator<String> outer, Iterator<String> inner) {
+		List<String> similarStrings = new LinkedList<String>();
+		if (outer.hasNext()) {
+			String currentMessage = outer.next();
+			while (inner.hasNext()) {
+				String s = inner.next();
+				MetricCheck check = new TwoChecksComposite(
+						new LessCheck(new LevenshteinDistance(currentMessage, s), 20),
+						new MoreCheck(new OverlapCoefficient(currentMessage, s), 90),
+						new LessCheck(new MinOfTwoStringsLength(currentMessage, s), LENGTH_THRESHOLD));
+				if (check.isTrue()) {
+					similarStrings.add(s);
+				}
+			}
+		}
+		return similarStrings;
+	}
+	
+	/**
 	 * @param root
 	 * @implNote GridPane uses maxSize property instead of prefferedSize, 
 	 * using preferredSize makes no effect or weird behavior 
@@ -88,45 +109,20 @@ public class EmptySimilarMessagesPane implements Pane {
 		Label generatedLabel = new Label("Generated template:");
 		Button similar = new Button("Next group of similar messages");
 		similar.setOnAction(event -> {
-			System.out.println("changeGroupButton pressed");
-			userTemplateText.setText("");
-			//TODO Быстро переписать это говно!! Из-за него и тормозит!
-			List<String> similarMessages = getNextSimilarGroup();
+			Iterator<String> outer = this.messages.iterator();
+			List<String> similarMessages = getNextSimilarGroup(outer, this.messages.iterator());
 			while (similarMessages.size() == 1) {
-				System.out.println("similarMessages.size==1");
-				similarMessages = getNextSimilarGroup();
+				similarMessages = getNextSimilarGroup(outer, this.messages.iterator());
 			}
-			if (!similarMessages.isEmpty()) {
-				setInput(similarMessages);
+			if (similarMessages.isEmpty()) {
+				Pane pane = new NoMoreSimilarMessagesPane(this.width, this.height);
+				pane.showOn(stage);
 			} else {
-				listViewer.setInput(new String[] { "No more similar groups. Seems you are stuck here. =)" });
+				String lcSequence = new SubsequenceForGroup(similarMessages).subsequence();
+				String template = new TemplateFromGroupAndLCSubsequence(similarMessages, lcSequence).template(); 
+				Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages, similarMessages, template, outer);
+				pane.showOn(stage);
 			}
-
-			
-			// TODO this was method getNextSimilarGroup()
-			List<String> similarStrings = new LinkedList<String>();
-			for(String currentMessage: this.messages) {
-				for (String s : this.messages) {
-					MetricCheck check = new TwoChecksComposite(
-							new LessCheck(new LevenshteinDistance(currentMessage, s), 20),
-							new MoreCheck(new OverlapCoefficient(currentMessage, s), 90),
-							new LessCheck(new MinOfTwoStringsLength(currentMessage, s), 150));
-					if (check.isTrue()) {
-						similarStrings.add(s);
-					}
-				}
-				if(similarStrings.size()==1){
-					break;
-				}
-				String lcSequence = new SubsequenceForGroup(similarStrings).subsequence();
-				String unitedTemplate = new TemplateFromGroupAndLCSubsequence(similarStrings, lcSequence).template(); 
-						Templates.getUnitedTemplate(similarStrings, lcSequence);
-				offeredTemplateText.setText(unitedTemplate);
-			}
-			////////////////////////
-			
-			Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages);
-			pane.showOn(stage);
 		});
 		TextField generatedText = new TextField();
 		generatedText.setDisable(true);

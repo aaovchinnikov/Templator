@@ -19,7 +19,7 @@ public class MinOfTwoStringsLength implements Metric {
 	}
 
 	@Override
-	public int compute() {
+	public int value() {
 		return Math.min(s1.length(), s2.length());
 	}
 

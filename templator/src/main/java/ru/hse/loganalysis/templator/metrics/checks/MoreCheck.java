@@ -21,7 +21,7 @@ public class MoreCheck implements MetricCheck {
 
 	@Override
 	public boolean isTrue() {
-		return this.metric.compute() < this.threshold;
+		return this.metric.value() < this.threshold;
 	}
 
 	@Override

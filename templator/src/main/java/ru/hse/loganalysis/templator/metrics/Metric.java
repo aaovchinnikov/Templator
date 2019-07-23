@@ -1,9 +1,14 @@
 package ru.hse.loganalysis.templator.metrics;
 
+/**
+ * Represents integer metric of any kind
+ * @author aaovchinnikov
+ *
+ */
 public interface Metric {
 	/**
-	 * Computes the distance/similarity metric.
-	 * @return result of metric computation
+	 * Returns value of metric
+	 * @return value of metric
 	 */
-	int compute();
+	int value();
 }

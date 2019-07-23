@@ -26,7 +26,7 @@ public class OverlapCoefficient implements Metric {
 	 * The shorter string is used as a base in division.
 	 */
 	@Override
-	public int compute() {
+	public int value() {
 		String lcs = new DefaultSubsequence(this.s1, this.s2).subsequence();
 		int base = Math.min(s1.length(), s2.length());
 		return base == 0 ? 0 : (int) lcs.length() * 100 / base;

@@ -24,7 +24,7 @@ public class LevenshteinDistance implements Metric {
 	 * without deep understanding.
 	 */
 	@Override
-	public int compute() {
+	public int value() {
 		int m = this.s1.length(); 
 		int n = this.s2.length();
 		int[] D1;
