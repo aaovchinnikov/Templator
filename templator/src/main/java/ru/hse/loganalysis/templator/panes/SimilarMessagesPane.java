@@ -3,25 +3,23 @@ package ru.hse.loganalysis.templator.panes;
 import java.util.List;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.hse.loganalysis.templator.lcs.SimilarGroup;
 import ru.hse.loganalysis.templator.lcs.SubsequenceForGroup;
@@ -73,45 +71,32 @@ public class SimilarMessagesPane implements Pane {
 	}
 
 	/**
-	 * @param root
 	 * @implNote GridPane uses maxSize property instead of prefferedSize, 
 	 * using preferredSize makes no effect or weird behavior 
 	 */
-	private void addTemplatesToCenterOfPane(GridPane root, Stage stage) {
-		
+	private TitledPane createTemplateView(Stage stage) {
 		List<String> similarMessages = this.group.group();
 		while (similarMessages.size() == 1) {
 			similarMessages = group.group();
 		}
 		if (similarMessages.isEmpty()) {
-			Pane pane = new NoMoreSimilarMessagesPane(this.width, this.height);
-			pane.showOn(stage);
-		} else {
-			String lcSequence = new SubsequenceForGroup(similarMessages).subsequence();
-			String template = new TemplateFromGroupAndLCSubsequence(similarMessages, lcSequence).template(); 
-			
-		}
-		
-		Label label = new Label(
-				"Press \"Next group of similar messages\" below to generate next template based on loaded messages");
-		label.setWrapText(true);
-		label.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, null, null)));
-		label.setMaxHeight(Double.MAX_VALUE);
-		label.setPadding(new Insets(5));
+			//TODO implement this behavior
+			throw new IllegalStateException("similarMessages is empty");
+		} 
+		String lcSequence = new SubsequenceForGroup(similarMessages).subsequence();
+		String template = new TemplateFromGroupAndLCSubsequence(similarMessages, lcSequence).template(); 
+		ListView<String> view = new ListView<String>(FXCollections.observableList(similarMessages));
 		Label generatedLabel = new Label("Generated template:");
 		Button similar = new Button("Next group of similar messages");
 		similar.setOnAction(event -> {
 			Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages, this.group);
 			pane.showOn(stage);
-
 		});
-		TextField generatedText = new TextField();
+		TextField generatedText = new TextField(template);
 		generatedText.setDisable(true);
 		Label userLabel = new Label("User template:");
 		Button copy = new Button("Copy generated template");
-		copy.setDisable(true);
 		TextField userText = new TextField();
-		userText.setDisable(true);
 		GridPane grid = new GridPane();
 		ColumnConstraints col0 = new ColumnConstraints();
 		ColumnConstraints col1 = new ColumnConstraints();
@@ -119,9 +104,8 @@ public class SimilarMessagesPane implements Pane {
 		col1.setHalignment(HPos.RIGHT);
 		grid.getColumnConstraints().add(col0);		
 		grid.getColumnConstraints().add(col1);
-		grid.add(label, 0, 0, 2, 1);
-		GridPane.setVgrow(label, Priority.ALWAYS);
-		GridPane.setHalignment(label, HPos.CENTER);
+		grid.add(view, 0, 0, 2, 1);
+		GridPane.setVgrow(view, Priority.ALWAYS);
 		grid.add(generatedLabel, 0, 1);
 		grid.add(similar, 1, 1);
 		final Insets ins = new Insets(2,0,2,2);
@@ -131,13 +115,12 @@ public class SimilarMessagesPane implements Pane {
 		grid.add(copy, 1, 3);
 		GridPane.setMargin(copy, ins);
 		grid.add(userText, 0, 4, 2, 1);
-		TitledPane templates = new TitledPane();
-		templates.setText("Groups and templates");
-		templates.setCollapsible(false);
-		templates.setContent(grid);
-		templates.setMaxHeight(Double.MAX_VALUE);
-		root.add(templates, 0, 1);
-		GridPane.setMargin(templates, new Insets(5));
+		TitledPane pane = new TitledPane();
+		pane.setText("Groups and templates");
+		pane.setCollapsible(false);
+		pane.setContent(grid);
+		pane.setMaxHeight(Double.MAX_VALUE);
+		return pane;
 	}
 	
 	/**
@@ -193,8 +176,9 @@ public class SimilarMessagesPane implements Pane {
 		GridPane root = createGirdPane();
 		MenuBar bar = createMenuBar();
 		root.add(bar, 0, 0, 2, 1);
-		
-		addTemplatesToCenterOfPane(root, stage);
+		TitledPane template = createTemplateView(stage);
+		root.add(template, 0, 1);
+		GridPane.setMargin(template, new Insets(5));
 		AnchorPane anchor = createAnchorPaneWithNextButton();
 		root.add(anchor, 1, 2);
 		TitledPane placeholders = createPlaceholdersView();
@@ -203,7 +187,4 @@ public class SimilarMessagesPane implements Pane {
 		GridPane.setMargin(placeholders, ins5);
 		stage.setScene(new Scene(root, this.width, this.height));
 	}
-
-
-
 }
