@@ -26,11 +26,16 @@ import javafx.stage.Stage;
 import ru.hse.loganalysis.templator.lcs.IteratingSimilarGroup;
 import ru.hse.loganalysis.templator.lcs.SimilarGroup;
 import ru.hse.loganalysis.templator.metrics.LevenshteinDistance;
+import ru.hse.loganalysis.templator.metrics.MinOfTwoStringsLength;
+import ru.hse.loganalysis.templator.metrics.OverlapCoefficient;
 import ru.hse.loganalysis.templator.metrics.checks.LessCheck;
+import ru.hse.loganalysis.templator.metrics.checks.MoreCheck;
 import ru.hse.loganalysis.templator.metrics.checks.TwoChecksComposite;
 
 public class EmptySimilarMessagesPane implements Pane {
 	private static final int LENGTH_THRESHOLD = 150;
+	private static final int LEVENSHTEIN_DISTANCE_THRESHOLD = 20;
+	private static final int OVERLAP_COEFFICIENT_THRESHOLD = 90;
 	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
 	private final int width;
 	private final int height;
@@ -80,7 +85,11 @@ public class EmptySimilarMessagesPane implements Pane {
 		Button similar = new Button("Next group of similar messages");
 		similar.setOnAction(event -> {
 			SimilarGroup group = new IteratingSimilarGroup(this.messages,
-					new LessCheck(new LevenshteinDistance(s1, s2), 20));
+					new TwoChecksComposite(
+							new LessCheck(new LevenshteinDistance(), LEVENSHTEIN_DISTANCE_THRESHOLD),
+							new MoreCheck(new OverlapCoefficient(), OVERLAP_COEFFICIENT_THRESHOLD),
+							new LessCheck(new MinOfTwoStringsLength(), LENGTH_THRESHOLD))
+					);
 			Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages, group);
 			pane.showOn(stage);
 		});

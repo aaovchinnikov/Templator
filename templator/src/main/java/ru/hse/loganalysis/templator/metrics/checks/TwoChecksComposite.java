@@ -24,16 +24,16 @@ public class TwoChecksComposite implements MetricCheck {
 	}
 
 	@Override
-	public boolean isTrue() {
-		if (this.condition.isTrue()) {
-			return this.check1.isTrue();
+	public boolean isTrue(String s1, String s2) {
+		if (this.condition.isTrue(s1, s2)) {
+			return this.check1.isTrue(s1, s2);
 		} else {
-			return this.check2.isTrue();
+			return this.check2.isTrue(s1, s2);
 		}
 	}
 
 	@Override
-	public boolean isFalse() {
-		return !isTrue();
+	public boolean isFalse(String s1, String s2) {
+		return !isTrue(s1, s2);
 	}
 }

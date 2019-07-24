@@ -6,21 +6,8 @@ package ru.hse.loganalysis.templator.metrics;
  *
  */
 public class MinOfTwoStringsLength implements Metric {
-	private final String s1;
-	private final String s2;
-	
-	/**
-	 * @param s1
-	 * @param s2
-	 */
-	public MinOfTwoStringsLength(String s1, String s2) {
-		this.s1 = s1;
-		this.s2 = s2;
-	}
-
 	@Override
-	public int value() {
+	public int value(String s1, String s2) {
 		return Math.min(s1.length(), s2.length());
 	}
-
 }

@@ -5,10 +5,10 @@ public interface MetricCheck {
 	 * @implSpec implementations should guarantee that isFalse == !(isTrue) and the reverse (i.e isTrue == !(isFalse))
 	 * @return
 	 */
-	boolean isTrue();
+	boolean isTrue(final String s1, final String s2);
 	/**
 	 * @implSpec implementations should guarantee that isFalse == !(isTrue) and the reverse (i.e isTrue == !(isFalse))
 	 * @return
 	 */
-	boolean isFalse();
+	boolean isFalse(final String s1, final String s2);
 }

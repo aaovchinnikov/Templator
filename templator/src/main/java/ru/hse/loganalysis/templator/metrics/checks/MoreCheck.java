@@ -20,13 +20,13 @@ public class MoreCheck implements MetricCheck {
 	}
 
 	@Override
-	public boolean isTrue() {
-		return this.metric.value() > this.threshold;
+	public boolean isTrue(String s1, String s2) {
+		return this.metric.value(s1,s2) > this.threshold;
 	}
 
 	@Override
-	public boolean isFalse() {
-		return !isTrue();
+	public boolean isFalse(String s1, String s2) {
+		return !isTrue(s1,s2);
 	}
 
 }
