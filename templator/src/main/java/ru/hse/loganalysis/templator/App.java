@@ -19,7 +19,7 @@ public class App extends Application {
     public void start(Stage stage) {
  //   	new EmptySourceDataPane(640,480).showOn(stage);
 		try {
-	    	List<String> messages = Files.readAllLines(Paths.get("C:\\Users\\Инженер\\Documents\\system.log"));
+	    	List<String> messages = Files.readAllLines(Paths.get("C:\\Users\\aaovchinnikov\\Documents\\system.log"));
 	       	new EmptySimilarMessagesPane(640, 480, messages).showOn(stage);	        
 		} catch (IOException e) {
 			e.printStackTrace();

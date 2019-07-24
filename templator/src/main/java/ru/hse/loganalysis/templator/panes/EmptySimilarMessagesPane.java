@@ -1,7 +1,5 @@
 package ru.hse.loganalysis.templator.panes;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -25,19 +23,15 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import ru.hse.loganalysis.templator.lcs.SubsequenceForGroup;
+import ru.hse.loganalysis.templator.lcs.IteratingSimilarGroup;
+import ru.hse.loganalysis.templator.lcs.SimilarGroup;
 import ru.hse.loganalysis.templator.metrics.LevenshteinDistance;
-import ru.hse.loganalysis.templator.metrics.MinOfTwoStringsLength;
-import ru.hse.loganalysis.templator.metrics.OverlapCoefficient;
 import ru.hse.loganalysis.templator.metrics.checks.LessCheck;
-import ru.hse.loganalysis.templator.metrics.checks.MetricCheck;
-import ru.hse.loganalysis.templator.metrics.checks.MoreCheck;
 import ru.hse.loganalysis.templator.metrics.checks.TwoChecksComposite;
-import ru.hse.loganalysis.templator.templates.TemplateFromGroupAndLCSubsequence;
 
 public class EmptySimilarMessagesPane implements Pane {
-	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
 	private static final int LENGTH_THRESHOLD = 150;
+	private static final double RIGHT_PERCENTAGE_WIDTH = 25.0;
 	private final int width;
 	private final int height;
 	private final List<String> messages;
@@ -71,33 +65,9 @@ public class EmptySimilarMessagesPane implements Pane {
 	}
 
 	/**
-	 * Performs one step on outer iterator and full cycle on inner iterator to search for similar strings.  
-	 * @param outer - outer iterator of list with messages
-	 * @param inner - inner iterator of list with messages
-	 * @return list of messages similar to one from outer.next() call.
-	 */
-	private List<String> getNextSimilarGroup(Iterator<String> outer, Iterator<String> inner) {
-		List<String> similarStrings = new LinkedList<String>();
-		if (outer.hasNext()) {
-			String currentMessage = outer.next();
-			while (inner.hasNext()) {
-				String s = inner.next();
-				MetricCheck check = new TwoChecksComposite(
-						new LessCheck(new LevenshteinDistance(currentMessage, s), 20),
-						new MoreCheck(new OverlapCoefficient(currentMessage, s), 90),
-						new LessCheck(new MinOfTwoStringsLength(currentMessage, s), LENGTH_THRESHOLD));
-				if (check.isTrue()) {
-					similarStrings.add(s);
-				}
-			}
-		}
-		return similarStrings;
-	}
-	
-	/**
 	 * @param root
-	 * @implNote GridPane uses maxSize property instead of prefferedSize, 
-	 * using preferredSize makes no effect or weird behavior 
+	 * @implNote GridPane uses maxSize property instead of prefferedSize, using
+	 *           preferredSize makes no effect or weird behavior
 	 */
 	private void addTemplatesToCenterOfPane(GridPane root, Stage stage) {
 		Label label = new Label(
@@ -109,20 +79,10 @@ public class EmptySimilarMessagesPane implements Pane {
 		Label generatedLabel = new Label("Generated template:");
 		Button similar = new Button("Next group of similar messages");
 		similar.setOnAction(event -> {
-			Iterator<String> outer = this.messages.iterator();
-			List<String> similarMessages = getNextSimilarGroup(outer, this.messages.iterator());
-			while (similarMessages.size() == 1) {
-				similarMessages = getNextSimilarGroup(outer, this.messages.iterator());
-			}
-			if (similarMessages.isEmpty()) {
-				Pane pane = new NoMoreSimilarMessagesPane(this.width, this.height);
-				pane.showOn(stage);
-			} else {
-				String lcSequence = new SubsequenceForGroup(similarMessages).subsequence();
-				String template = new TemplateFromGroupAndLCSubsequence(similarMessages, lcSequence).template(); 
-				Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages, similarMessages, template, outer);
-				pane.showOn(stage);
-			}
+			SimilarGroup group = new IteratingSimilarGroup(this.messages,
+					new LessCheck(new LevenshteinDistance(s1, s2), 20));
+			Pane pane = new SimilarMessagesPane(this.width, this.height, this.messages, group);
+			pane.showOn(stage);
 		});
 		TextField generatedText = new TextField();
 		generatedText.setDisable(true);
@@ -136,14 +96,14 @@ public class EmptySimilarMessagesPane implements Pane {
 		ColumnConstraints col1 = new ColumnConstraints();
 		col1.setHgrow(Priority.ALWAYS);
 		col1.setHalignment(HPos.RIGHT);
-		grid.getColumnConstraints().add(col0);		
+		grid.getColumnConstraints().add(col0);
 		grid.getColumnConstraints().add(col1);
 		grid.add(label, 0, 0, 2, 1);
 		GridPane.setVgrow(label, Priority.ALWAYS);
 		GridPane.setHalignment(label, HPos.CENTER);
 		grid.add(generatedLabel, 0, 1);
 		grid.add(similar, 1, 1);
-		final Insets ins = new Insets(2,0,2,2);
+		final Insets ins = new Insets(2, 0, 2, 2);
 		GridPane.setMargin(similar, ins);
 		grid.add(generatedText, 0, 2, 2, 1);
 		grid.add(userLabel, 0, 3);
@@ -161,12 +121,13 @@ public class EmptySimilarMessagesPane implements Pane {
 
 	/**
 	 * @param root
-	 * @implNote GridPane uses maxSize property instead of prefferedSize, 
-	 * using preferredSize makes no effect or weird behavior 
+	 * @implNote GridPane uses maxSize property instead of prefferedSize, using
+	 *           preferredSize makes no effect or weird behavior
 	 */
 	private void addPlaceholdersViewToRightOfPane(GridPane root) {
 		final Insets ins5 = new Insets(5);
-		Label label = new Label("Use \"Load placeholders\" in \"Placeholders\" menu to load previously saved placeholders");
+		Label label = new Label(
+				"Use \"Load placeholders\" in \"Placeholders\" menu to load previously saved placeholders");
 		label.setWrapText(true);
 		label.setPadding(ins5);
 		TitledPane placeholders = new TitledPane();
